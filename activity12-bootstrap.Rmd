@@ -1,6 +1,6 @@
 ---
 title: "Activity 12"
-author: "Name"
+author: "Brice Kramer"
 output: github_document
 ---
 
@@ -14,7 +14,8 @@ knitr::opts_chunk$set(error = TRUE)
 In this activity you will be bootstrapping - a form of statistical inference that uses resampling methods.
 First, you will need `{tidyverse}` and `{infer}`.
 
-
+library(tidyverse)
+library(infer)
 ### Data
 
 In this Activity, you analyze data from the 2016 General Social Survey (GSS), using it to estimate values of population parameters of interest about US adults.
@@ -58,6 +59,10 @@ Our variable of interest for this Activity is going to be `educ` which is the nu
 Plot a histogram of `educ` with an overlaying density.
 Comment on the center, spread, and shape.
 
+```{r}
+ggplot(gss, aes(x = educ)) +
+  geom_histogram(binwidth = 1, color = "white")
+```
 
 
 
@@ -68,14 +73,14 @@ Suppose we're interested in making inference about the typical number of years o
 Is the mean a good statistic to use here to describe the typical value of salary?
 Why or why not?
 
-**Response**:
+**Response**: No, becuase we have no data on salary in relation to education.
 
 
 Recall from your introductory statistics course that a one-sample *t*-test requires that the sample mean is Normally distributed.
 Does this assumption seem reasonable for the mean number of years of education?
 Why or why not?
 
-***Response**:
+***Response**: Yes, it reasonably represents a bell shaped distribution.
 
 
 Since our sample size is so large, the distribution of the *sample mean* is approximately Normal (the CLT!).
@@ -86,6 +91,11 @@ Use this function to construct a 90% confidence interval for the mean number of 
 
 
 **Response**:
+```{r CI t test for mean number of edu years}
+t.test(gss$educ, conf.level = .9)
+
+```
+
 
 
 ### Bootstrapping
@@ -124,6 +134,13 @@ Then, use the appropriate `purrr::map` function to calculate the mean for each o
 The last thing you want is those samples to change every time you knit your document because your interpretations might be slightly different so you will need to set a seed that is your birthday in `yymmdd` format (your instructor's seed would be set to the number `851217`).
 
 
+```{r sample }
+set.seed(91593)
+
+boot_edu_1000 <- rerun(1000, sample(gss_educ$educ, size = nrow(gss_educ), replace = TRUE))
+boot_means <- map_dbl(boot_edu_1000, mean)
+
+```
 
 
 
